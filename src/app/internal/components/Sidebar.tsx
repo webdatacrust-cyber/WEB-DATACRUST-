@@ -22,6 +22,7 @@ const navItems: NavItem[] = [
   { name: "Tasks", href: "/internal/tasks" },
   { name: "Activity", href: "/internal/activity", requiredRole: "ADMIN" },
   { name: "Clients", href: "/internal/clients" },
+  { name: "Contacts", href: "/internal/contacts", requiredRole: "ADMIN" },
   { name: "Content", href: "/internal/content", requiredRole: "ADMIN" },
   { name: "Services", href: "/internal/services", requiredRole: "ADMIN" },
   { name: "SEO", href: "/internal/seo", requiredRole: "ADMIN" },
