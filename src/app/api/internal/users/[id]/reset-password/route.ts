@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/authOptions";
 import { generateTempPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -27,6 +28,15 @@ export async function POST(
       return NextResponse.json(
         { error: "Forbidden: Admin access required" },
         { status: 403 }
+      );
+    }
+
+    // Rate limiting: 10 password resets per hour per admin
+    const rateLimitKey = `password-reset:${session.user.id}`;
+    if (!checkRateLimit(rateLimitKey, 10, 3600)) {
+      return NextResponse.json(
+        { error: "Too many password reset attempts. Please try again later." },
+        { status: 429 }
       );
     }
 

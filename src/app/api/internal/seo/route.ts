@@ -1,11 +1,14 @@
 import { PageKey } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/internal/seo
  * Get all PageSEO records or a specific one by pageKey
  * Query params: pageKey (optional)
+ * Public endpoint - no auth required for GET
  */
 export async function GET(request: NextRequest) {
     try {
@@ -44,10 +47,25 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/internal/seo
- * Create or update a PageSEO record
+ * Create or update a PageSEO record (ADMIN only)
  */
 export async function POST(request: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+
+        // Check authentication
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        // Check admin role
+        if (session.user.role !== "ADMIN") {
+            return NextResponse.json(
+                { error: "Forbidden: Admin access required" },
+                { status: 403 }
+            );
+        }
+
         const body = await request.json();
         const {
             pageKey,

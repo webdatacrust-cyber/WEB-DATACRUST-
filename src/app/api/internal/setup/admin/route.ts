@@ -6,11 +6,31 @@ import { prisma } from "@/lib/prisma";
 
 const sanitizeEmail = (email: string) => email.trim().toLowerCase();
 
+/**
+ * POST /api/internal/setup/admin
+ * Create initial admin account (DISABLED IN PRODUCTION)
+ * Only accessible during initial setup (when no users exist)
+ */
 export async function POST(request: Request) {
-  if (process.env.ALLOW_ADMIN_SETUP !== "true") {
+  // ⚠️  SECURITY: This endpoint is dangerous and should ONLY be enabled during initial deployment
+  // Default: DISABLED. Must be explicitly enabled via environment variable
+  const isSetupEnabled = process.env.ALLOW_ADMIN_SETUP === "true" && process.env.NODE_ENV !== "production";
+
+  if (!isSetupEnabled) {
     return NextResponse.json(
-      { error: "Admin setup is disabled." },
+      { error: "Admin setup is disabled. This endpoint is only available during initial setup." },
       { status: 403 }
+    );
+  }
+
+  // Additional security: Verify setup token if setup is enabled
+  const authHeader = request.headers.get("authorization");
+  const expectedToken = process.env.SETUP_TOKEN;
+
+  if (expectedToken && authHeader !== `Bearer ${expectedToken}`) {
+    return NextResponse.json(
+      { error: "Invalid or missing setup token." },
+      { status: 401 }
     );
   }
 
@@ -67,7 +87,7 @@ export async function POST(request: Request) {
     if (error instanceof Error) {
       if (error.message === "SETUP_LOCKED") {
         return NextResponse.json(
-          { error: "Admin setup is no longer available." },
+          { error: "Admin setup is no longer available. System is already initialized." },
           { status: 403 }
         );
       }

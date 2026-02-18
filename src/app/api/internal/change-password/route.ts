@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // Password validation rules
 const MIN_PASSWORD_LENGTH = 8;
@@ -35,6 +36,15 @@ export async function POST(request: NextRequest) {
     // Check authentication
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Rate limiting: 5 attempts per minute per user
+    const rateLimitKey = `password-change:${session.user.id}`;
+    if (!checkRateLimit(rateLimitKey, 5, 60)) {
+      return NextResponse.json(
+        { error: "Too many password change attempts. Please try again later." },
+        { status: 429 }
+      );
     }
 
     const { currentPassword, newPassword } = await request.json();
