@@ -6,6 +6,8 @@
     "dev": "npm run prisma:setup:dev && next dev",
     "prisma:setup:dev": "prisma generate --schema=./prisma/schema.prisma",
     "build": "prisma generate --schema=./prisma/schema.prisma && next build",
+    "migrate:repair:render": "prisma migrate resolve --rolled-back 20260315120000_postgres_baseline --schema=./prisma/schema.prisma || true",
+    "build:render": "npm run migrate:repair:render && prisma migrate deploy --schema=./prisma/schema.prisma && npm run build",
     "start": "next start",
     "start:render": "prisma migrate deploy --schema=./prisma/schema.prisma && next start",
     "lint": "eslint"
