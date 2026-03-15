@@ -21,6 +21,7 @@
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.3.0",
     "@tailwindcss/postcss": "^4.2.1",
+    "@types/bcrypt": "^6.0.0",
     "autoprefixer": "^10.4.24",
     "bcrypt": "^6.0.0",
     "framer-motion": "^12.31.1",
@@ -35,7 +36,6 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20.19.31",
     "@types/react": "^19",
     "@types/react-dom": "^19",
