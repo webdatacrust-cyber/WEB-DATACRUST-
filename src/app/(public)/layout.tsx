@@ -16,6 +16,8 @@ export const metadata: Metadata = {
     description: "A modern platform for startup management and growth.",
 };
 
+export const dynamic = "force-dynamic";
+
 /**
  * Public layout - Wrapper for all public-facing pages
  * Includes global footer and smooth scroll behavior
